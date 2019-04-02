@@ -90,6 +90,8 @@ class ClientHandler extends Thread
                     this.s.close();
                     System.out.println("Connection closed");
                     break;
+                } else {
+                    System.out.println("The client sends: " + received);
                 }
 
                 // creating Date object
