@@ -1,12 +1,15 @@
 // Java implementation for a client
 // Save file as Client.java
 
-import java.io.*;
-import java.net.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.util.Scanner;
 
 // Client class
-public class Client {
+public class Client2 {
 
     static Network networkHandle;
 

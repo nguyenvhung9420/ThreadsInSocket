@@ -10,11 +10,12 @@ import java.net.*;
 // Server class
 public class Server
 {
-
-
     public static void main(String[] args) throws IOException
     {
         int numOfClient = 0;
+
+        //New array list of threads:
+        ArrayList<Thread> threads = new ArrayList<Thread>();
 
         // server is listening on port 5056
         ServerSocket server = new ServerSocket(5056);
@@ -47,15 +48,26 @@ public class Server
 
                 // create a new thread object
                 Thread t = new ClientHandler(client, dis, dos);
+                threads.add(t);
 
                 // Invoking the start() method
                 t.start();
+
+                //Do something for all threads:
+                threads.forEach(thread -> {
+                    try {
+                        dos.writeUTF("Hello all from Server");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
 
             }
             catch (Exception e){
                 client.close();
                 e.printStackTrace();
             }
+
         }
     }
 }
@@ -93,12 +105,13 @@ class ClientHandler extends Thread
     {
         gameForm.setVisible(true);
 
-
+        /*
         try {
-            networkHandle = new Network(s.getPort());
+            networkHandle = new Network(5056);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        */
 
 
         String received;
