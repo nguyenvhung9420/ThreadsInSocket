@@ -10,39 +10,50 @@ import java.net.*;
 // Server class
 public class Server
 {
+
+
     public static void main(String[] args) throws IOException
     {
-        // server is listening on port 5056
-        ServerSocket ss = new ServerSocket(5056);
+        int numOfClient = 0;
 
-        // running infinite loop for getting
-        // client request
+        // server is listening on port 5056
+        ServerSocket server = new ServerSocket(5056);
+
+        // running infinite loop for getting client request
         while (true)
         {
-            Socket s = null;
+            Socket client = null;
 
             try
             {
                 // socket object to receive incoming client requests
-                s = ss.accept();
+                client = server.accept();
+                numOfClient += 1;
 
-                System.out.println("A new client is connected : " + s);
+                System.out.println("Client " + numOfClient + " is connected : " + client);
+
+                //Get a new form to show:
+                //gameForms.add(new MainFormUI());
+                //gameForms.get(gameForms.size() - 1).setVisible(true);
 
                 // obtaining input and out streams
-                DataInputStream dis = new DataInputStream(s.getInputStream());
-                DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+                DataInputStream dis = new DataInputStream(client.getInputStream());
+                DataOutputStream dos = new DataOutputStream(client.getOutputStream());
+
+                //Send to client its port:
+                dos.writeUTF(client.getPort() + "");
 
                 System.out.println("Assigning new thread for this client");
 
                 // create a new thread object
-                Thread t = new ClientHandler(s, dis, dos);
+                Thread t = new ClientHandler(client, dis, dos);
 
                 // Invoking the start() method
                 t.start();
 
             }
             catch (Exception e){
-                s.close();
+                client.close();
                 e.printStackTrace();
             }
         }
@@ -58,6 +69,8 @@ class ClientHandler extends Thread
     final DataOutputStream dos;
     final Socket s;
 
+    MainFormUI gameForm = new MainFormUI();
+    private Network networkHandle;
 
     // Constructor
     public ClientHandler(Socket s, DataInputStream dis, DataOutputStream dos)
@@ -67,15 +80,32 @@ class ClientHandler extends Thread
         this.dos = dos;
     }
 
+    public void sendToServerToPublish(String messageToSend){
+        try {
+            dos.writeUTF(messageToSend);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void run()
     {
+        gameForm.setVisible(true);
+
+
+        try {
+            networkHandle = new Network(s.getPort());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         String received;
         String toreturn;
         while (true)
         {
             try {
-
                 // Ask user what he wants
                 dos.writeUTF("What do you want?[Date | Time]..\n"+
                         "Type Exit to terminate connection.");
@@ -92,6 +122,11 @@ class ClientHandler extends Thread
                     break;
                 } else {
                     System.out.println("The client sends: " + received);
+                    gameForm.appendTextToForm(received);
+                    sendToServerToPublish(received);
+
+                    //String nachricht = networkHandle.receive();
+                    //System.out.println("Received via Network: " + nachricht);
                 }
 
                 // creating Date object

@@ -6,13 +6,20 @@ import java.net.*;
 import java.util.Scanner;
 
 // Client class
-public class Client
-{
-    public static void main(String[] args) throws IOException
-    {
-        try
-        {
+public class Client {
+
+    private Network networkHandle;
+
+    public static void main(String[] args) throws IOException {
+        try {
             Scanner scn = new Scanner(System.in);
+            /*
+            try {
+                networkHandle = new Network(s.getPort());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            */
 
             // getting localhost ip
             InetAddress ip = InetAddress.getByName("localhost");
@@ -24,18 +31,20 @@ public class Client
             DataInputStream dis = new DataInputStream(s.getInputStream());
             DataOutputStream dos = new DataOutputStream(s.getOutputStream());
 
+            //Get port from server:
+            String port = dis.readUTF();
+            System.out.println("This client is on port: " + port);
+
             // the following loop performs the exchange of
             // information between client and client handler
-            while (true)
-            {
+            while (true) {
                 System.out.println(dis.readUTF());
                 String tosend = scn.nextLine();
                 dos.writeUTF(tosend);
 
                 // If client sends exit,close this connection
                 // and then break from the while loop
-                if(tosend.equals("Exit"))
-                {
+                if (tosend.equals("Exit")) {
                     System.out.println("Closing this connection : " + s);
                     s.close();
                     System.out.println("Connection closed");
@@ -51,7 +60,7 @@ public class Client
             scn.close();
             dis.close();
             dos.close();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
